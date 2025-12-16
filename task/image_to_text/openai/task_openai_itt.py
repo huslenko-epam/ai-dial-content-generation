@@ -4,7 +4,12 @@ from pathlib import Path
 from task._utils.constants import API_KEY, DIAL_CHAT_COMPLETIONS_ENDPOINT
 from task._utils.model_client import DialModelClient
 from task._models.role import Role
-from task.image_to_text.openai.message import ContentedMessage, TxtContent, ImgContent, ImgUrl
+from task.image_to_text.openai.message import (
+    ContentedMessage,
+    TxtContent,
+    ImgContent,
+    ImgUrl,
+)
 
 
 def start() -> None:
@@ -13,7 +18,7 @@ def start() -> None:
 
     with open(image_path, "rb") as image_file:
         image_bytes = image_file.read()
-    base64_image = base64.b64encode(image_bytes).decode('utf-8')
+    base64_image = base64.b64encode(image_bytes).decode("utf-8")
 
     # TODO:
     #  1. Create DialModelClient
@@ -25,7 +30,20 @@ def start() -> None:
     #        Specification but since requests are going to the DIAL Core, we can use different models and DIAL Core
     #        will adapt them to format Gemini or Anthropic is using. In case if we go directly to
     #        the https://api.anthropic.com/v1/complete we need to follow Anthropic request Specification (the same for gemini)
-    raise NotImplementedError
+
+    dial_client = DialModelClient(DIAL_CHAT_COMPLETIONS_ENDPOINT, "gpt-4o", API_KEY)
+
+    message = ContentedMessage(
+        role=Role.USER,
+        content=[
+            TxtContent("Analise the image"),
+            ImgContent(ImgUrl("data:image/png;base64," + base64_image)),
+        ],
+    )
+
+    response_message = dial_client.get_completion([message])
+
+    print(f"Agent: {response_message.content}")
 
 
 start()

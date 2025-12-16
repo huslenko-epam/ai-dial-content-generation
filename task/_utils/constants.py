@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import os
 
 DIAL_URL = 'https://ai-proxy.lab.epam.com'
